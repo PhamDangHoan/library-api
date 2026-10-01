@@ -255,7 +255,7 @@ Không dùng `localhost` cho MySQL/Redis từ bên trong container API.
 ### Clone project
 
 ```powershell
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/PhamDangHoan/library-api.git
 cd library-api
 ```
 
