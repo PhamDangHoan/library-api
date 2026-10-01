@@ -1,0 +1,606 @@
+basePath: /
+definitions:
+  validators.BorrowBookRequest:
+    properties:
+      book_id:
+        type: integer
+      due_date:
+        type: string
+    required:
+    - book_id
+    type: object
+  validators.CreateAuthorRequest:
+    properties:
+      bio:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  validators.CreateBookRequest:
+    properties:
+      author_ids:
+        items:
+          type: integer
+        type: array
+      available:
+        minimum: 0
+        type: integer
+      description:
+        type: string
+      isbn:
+        type: string
+      quantity:
+        minimum: 0
+        type: integer
+      title:
+        type: string
+    required:
+    - isbn
+    - title
+    type: object
+  validators.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  validators.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  validators.UpdateAuthorRequest:
+    properties:
+      bio:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  validators.UpdateBookRequest:
+    properties:
+      author_ids:
+        items:
+          type: integer
+        type: array
+      available:
+        minimum: 0
+        type: integer
+      description:
+        type: string
+      isbn:
+        type: string
+      quantity:
+        minimum: 0
+        type: integer
+      title:
+        type: string
+    required:
+    - isbn
+    - title
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: |-
+    RESTful Library Management API.
+    Built with Go, Gin, GORM and MySQL.
+  title: Library API
+  version: "1.0"
+paths:
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/validators.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login
+      tags:
+      - Auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: Registration data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/validators.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - Auth
+  /api/v1/authors:
+    get:
+      description: Get all authors
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all authors
+      tags:
+      - Authors
+    post:
+      consumes:
+      - application/json
+      description: Create a new author
+      parameters:
+      - description: Author data
+        in: body
+        name: author
+        required: true
+        schema:
+          $ref: '#/definitions/validators.CreateAuthorRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create an author
+      tags:
+      - Authors
+  /api/v1/authors/{id}:
+    delete:
+      description: Soft delete an author
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an author
+      tags:
+      - Authors
+    get:
+      description: Get an author by ID
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get author by ID
+      tags:
+      - Authors
+    put:
+      consumes:
+      - application/json
+      description: Update author information
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Author data
+        in: body
+        name: author
+        required: true
+        schema:
+          $ref: '#/definitions/validators.UpdateAuthorRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an author
+      tags:
+      - Authors
+  /api/v1/books:
+    post:
+      consumes:
+      - application/json
+      description: Create a new book and optionally associate authors
+      parameters:
+      - description: Book data
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/validators.CreateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a book
+      tags:
+      - Books
+  /api/v1/books/{id}:
+    delete:
+      description: Soft delete a book. Admin role required.
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a book
+      tags:
+      - Books
+    get:
+      description: Get a single book by its ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get book by ID
+      tags:
+      - Books
+    put:
+      consumes:
+      - application/json
+      description: Update book information and replace its authors
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Book data
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/validators.UpdateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a book
+      tags:
+      - Books
+  /api/v1/borrows:
+    post:
+      consumes:
+      - application/json
+      description: Borrow a book for the authenticated user
+      parameters:
+      - description: Borrow data
+        in: body
+        name: borrow
+        required: true
+        schema:
+          $ref: '#/definitions/validators.BorrowBookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Borrow a book
+      tags:
+      - Borrow / Return
+  /api/v1/borrows/{id}/return:
+    post:
+      description: Return a book belonging to the authenticated user
+      parameters:
+      - description: Borrow ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Return a borrowed book
+      tags:
+      - Borrow / Return
+  /api/v1/borrows/my:
+    get:
+      description: Get borrowing records of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my borrowed books
+      tags:
+      - Borrow / Return
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
